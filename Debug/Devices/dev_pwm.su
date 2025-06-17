@@ -1,0 +1,6 @@
+../Devices/dev_pwm.c:54:6:DevPwm_LoadDuty	16	static
+../Devices/dev_pwm.c:62:6:DevPwm_LoadPeriod	16	static
+../Devices/dev_pwm.c:70:6:DevPwmFunc_Init	24	static
+../Devices/dev_pwm.c:91:6:DevPwmFunc_Main	24	static
+../Devices/dev_pwm.c:123:13:DevPwm_SetPulseDuty	32	static
+../Devices/dev_pwm.c:151:17:DevPwm_SetPulseFreq	40	static

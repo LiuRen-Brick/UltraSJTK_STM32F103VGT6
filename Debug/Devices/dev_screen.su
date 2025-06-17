@@ -1,0 +1,11 @@
+../Devices/dev_screen.c:36:13:DevScreen_StartorStop	16	static
+../Devices/dev_screen.c:42:13:DevScreen_SetUltraFreq	24	static
+../Devices/dev_screen.c:72:13:DevScreen_SetUltraVibra	16	static
+../Devices/dev_screen.c:83:13:DevScreen_SetUltraDuty	24	static
+../Devices/dev_screen.c:100:13:DevScreen_SetUltraPeriod	24	static
+../Devices/dev_screen.c:123:13:DevScreen_SetUltraWork	24	static
+../Devices/dev_screen.c:138:6:DevUart_Init	8	static
+../Devices/dev_screen.c:144:6:HAL_UART_IdleCallback	24	static
+../Devices/dev_screen.c:173:16:DevMotor_StaGet	16	static
+../Devices/dev_screen.c:181:17:DevWork_StimuTimeGet	16	static
+../Devices/dev_screen.c:188:17:DevWork_IdleTimeGet	16	static

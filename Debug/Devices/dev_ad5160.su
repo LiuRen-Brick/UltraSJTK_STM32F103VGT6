@@ -1,0 +1,7 @@
+../Devices/dev_ad5160.c:38:13:AD5160_Delay	16	static
+../Devices/dev_ad5160.c:45:13:AD5160_CSSet	16	static
+../Devices/dev_ad5160.c:50:13:AD5160_CLKSet	16	static
+../Devices/dev_ad5160.c:55:13:AD5160_DATASet	16	static
+../Devices/dev_ad5160.c:60:13:AD5160_SendData	24	static
+../Devices/dev_ad5160.c:86:6:DevAD5160Func_Init	16	static
+../Devices/dev_ad5160.c:97:6:DevAD5160Func_Main	16	static

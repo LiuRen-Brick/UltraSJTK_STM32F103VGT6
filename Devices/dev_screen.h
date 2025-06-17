@@ -1,0 +1,37 @@
+/*
+ * dev_screen.h
+ *
+ *  Created on: Jun 11, 2025
+ *      Author: szt
+ */
+
+#ifndef DEV_SCREEN_H_
+#define DEV_SCREEN_H_
+
+#include "main.h"
+
+#define DEV_SCREEN_UART_HANDLE   (&huart3)
+#define DEV_SCREEN_RXBUFF_SIZE		64
+#define DEV_SDREEN_TXBUFF_SZIE      16
+
+extern uint8_t ScreenRxBuff[DEV_SCREEN_RXBUFF_SIZE];
+
+typedef enum
+{
+	DevScreenCmd_WorkStart = 1,
+	DevScreenCmd_SetUltraFreq,
+	DevScreenCmd_SetUltraVibra,
+	DevScreenCmd_SetUltraDuty,
+	DevScreenCmd_SetUltraPeriod,
+	DevScreenCmd_SetUltraWork,
+	DevScreenCmdMax,
+}DevScreenCmdLable;
+
+void DevUart_Init(void);
+void HAL_UART_IdleCallback(UART_HandleTypeDef *huart);
+
+uint8_t DevMotor_StaGet(void);
+uint16_t DevWork_StimuTimeGet(void);
+uint16_t DevWork_IdleTimeGet(void);
+
+#endif /* DEV_SCREEN_H_ */
