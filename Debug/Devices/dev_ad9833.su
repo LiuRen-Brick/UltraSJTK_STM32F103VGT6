@@ -9,4 +9,4 @@
 ../Devices/dev_ad9833.c:189:13:DevAD9833_Reset	16	static
 ../Devices/dev_ad9833.c:212:13:DevAD9833_SetPara	32	static
 ../Devices/dev_ad9833.c:239:6:DevAD9833Set_Init	32	static
-../Devices/dev_ad9833.c:269:6:DevAd9833Set_Main	32	static
+../Devices/dev_ad9833.c:269:6:DevAD9833Set_Main	32	static

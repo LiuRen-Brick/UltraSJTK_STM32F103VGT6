@@ -57,6 +57,7 @@ void DevFlash_Read(uint32_t addr,uint16_t* buff,uint16_t len)
 
 void DevParam_Init(void)
 {
+	uint8_t tag_i = 0;
 	uint32_t read_addr = FLASH_SLAVE_ULTRAPARAM;
 
 	while(read_addr < (FLASH_SLAVE_ULTRAPARAM + PAGE_SIZE))
@@ -72,12 +73,59 @@ void DevParam_Init(void)
 			{
 				DevParamRead.UltraParam.WriteCount = 0;
 				break;
-			}
+			}else
+
 			FlashOffset -= (ULTRAPARAMSIZE * 2);
 			read_addr = FLASH_SLAVE_ULTRAPARAM + FlashOffset;
 			DevFlash_Read(read_addr,DevParamRead.UltraParamBuff,ULTRAPARAMSIZE);
 			break;
 		}
+	}
+
+	if(DevParamRead.UltraParam.VibraEnableFlg == 0xFFFF)
+	{
+		DevParamRead.UltraParam.VibraEnableFlg = 1;
+		DevParamRead.UltraParam.Vibra_Param = 0x0A;
+	}
+
+	if(DevParamRead.UltraParam.PlusePeriod[0] == 0xFFFF)
+	{
+		for(tag_i = 0;tag_i < ULTRACHNUM;tag_i++)
+		{
+			DevParamRead.UltraParam.PlusePeriod[tag_i] = 100;
+		}
+	}
+
+	if(DevParamRead.UltraParam.PluseDuty[0] == 0xFF)
+	{
+		for(tag_i = 0;tag_i < ULTRACHNUM;tag_i++)
+		{
+			DevParamRead.UltraParam.PluseDuty[tag_i] = 50;
+		}
+	}
+
+	if(DevParamRead.UltraParam.StimuTime == 0xFFFF)
+	{
+		DevParamRead.UltraParam.StimuTime = 1000;
+		DevParamRead.UltraParam.IdleTime = 1000;
+	}
+
+	if(DevParamRead.UltraParam.UltraEn[0] == 0xFF)
+	{
+		for(tag_i = 0;tag_i < ULTRACHNUM;tag_i++)
+		{
+			DevParamRead.UltraParam.UltraEn[tag_i] = 1;
+		}
+	}
+
+	if(DevParamRead.UltraParam.UltraWorkModule == 0xFFFF)
+	{
+		DevParamRead.UltraParam.UltraWorkModule = 2;
+	}
+
+	if(DevParamRead.UltraParam.UltraPowerLevel == 0xFFFF)
+	{
+		DevParamRead.UltraParam.UltraPowerLevel = 0;
 	}
 }
 

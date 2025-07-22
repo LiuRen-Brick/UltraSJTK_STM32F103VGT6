@@ -24,6 +24,9 @@ typedef enum
 	DevScreenCmd_SetUltraDuty,
 	DevScreenCmd_SetUltraPeriod,
 	DevScreenCmd_SetUltraWork,
+	DevScreenCmd_SetUltraChEn,
+	DevScreenCmd_SetUltraModule,
+	DevScreenCmd_SetUltraPower,
 	DevScreenCmdMax,
 }DevScreenCmdLable;
 
@@ -31,7 +34,9 @@ void DevUart_Init(void);
 void HAL_UART_IdleCallback(UART_HandleTypeDef *huart);
 
 uint8_t DevMotor_StaGet(void);
+uint8_t DevUltra_StatGet(uint8_t ch);
 uint16_t DevWork_StimuTimeGet(void);
 uint16_t DevWork_IdleTimeGet(void);
+uint8_t DevWork_ModuleGet(void);
 
 #endif /* DEV_SCREEN_H_ */

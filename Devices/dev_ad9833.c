@@ -266,7 +266,7 @@ void DevAD9833Set_Init(void)
 	}
 }
 
-void DevAd9833Set_Main(void)
+void DevAD9833Set_Main(void)
 {
 	uint8_t tag_i = 0;
 	uint32_t freq = 0;
@@ -284,6 +284,3 @@ void DevAd9833Set_Main(void)
 		}
 	}
 }
-
-
-

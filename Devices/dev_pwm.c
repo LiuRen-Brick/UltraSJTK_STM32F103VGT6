@@ -74,15 +74,15 @@ void DevPwmFunc_Init(void)
 
 	for(tag_i = 0;tag_i < DevUltraChMax;tag_i++)
 	{
-		pwm_duty[tag_i] = (DevParamRead.UltraParam.PluseDuty[tag_i] == 0xFF) ? 60 : DevParamRead.UltraParam.PluseDuty[tag_i];
-		pwm_period[tag_i] = (DevParamRead.UltraParam.PlusePeriod[tag_i] == 0xFFFF) ? 100 : DevParamRead.UltraParam.PlusePeriod[tag_i];
+		pwm_duty[tag_i] = DevParamRead.UltraParam.PluseDuty[tag_i];
+		pwm_period[tag_i] = DevParamRead.UltraParam.PlusePeriod[tag_i];
 
 		pwm_pluse[tag_i] = DevPwm_SetPulseFreq(tag_i,pwm_period[tag_i],pwm_duty[tag_i]);
 		pwm_duty_old[tag_i] = pwm_duty[tag_i];
 		pwm_period_old[tag_i] = pwm_period[tag_i];
 	}
 
-	motor_level = (DevParamRead.UltraParam.Vibra_Param == 0xFFFF) ? 0xA : (uint8_t)DevParamRead.UltraParam.Vibra_Param;
+	motor_level = DevParamRead.UltraParam.Vibra_Param;
 	MotorLevel = motor_level;
 
 	__HAL_TIM_SetCompare(MOTOR_HANDLE,MOTOR_CHANNEL,motor_level * MOTOR_STEP);
@@ -96,9 +96,13 @@ void DevPwmFunc_Main(void)
 	{
 		if(pwm_period_old[tag_i] != pwm_period[tag_i])
 		{
+			pwm_period_old[tag_i] = pwm_period[tag_i];
 			pwm_pluse[tag_i] = DevPwm_SetPulseFreq(tag_i,pwm_period[tag_i],pwm_duty[tag_i]);
-		}else if(pwm_duty_old[tag_i] != pwm_duty[tag_i])
+		}
+
+		if(pwm_duty_old[tag_i] != pwm_duty[tag_i])
 		{
+			pwm_duty_old[tag_i] = pwm_duty[tag_i];
 			DevPwm_SetPulseDuty(tag_i);
 		}else
 		{
@@ -129,15 +133,7 @@ static void DevPwm_SetPulseDuty(uint8_t ch)
 	channel = dev_ultra_handle[ch].Channel;
 	p_handle = dev_ultra_handle[ch].Handle;
 
-	if(pwm_duty[ch] == 100)
-	{
-		pulse = pwm_pluse[ch] + 1;
-	}else
-	{
-		pulse = pwm_duty[ch] * pwm_pluse[ch] / 100;
-	}
-
-
+	pulse = pwm_duty[ch] * pwm_pluse[ch] / 100;
 	__HAL_TIM_SetCompare(p_handle,channel,pulse);
 }
 /*
@@ -147,13 +143,13 @@ static void DevPwm_SetPulseDuty(uint8_t ch)
  * @retval	none
  * @func	调节脉冲时间和占空比
  */
-
 static uint32_t DevPwm_SetPulseFreq(uint8_t ch,uint32_t pulsetime,uint8_t duty)
 {
 	uint32_t input_freq = 0;
 	uint32_t out_prescaler_value = 0;
 	uint32_t out_count_value = 0;
 	uint32_t channel;
+	uint32_t pluse = 0;
 	TIM_HandleTypeDef *p_handle;
 
 	channel = dev_ultra_handle[ch].Channel;
@@ -186,7 +182,8 @@ static uint32_t DevPwm_SetPulseFreq(uint8_t ch,uint32_t pulsetime,uint8_t duty)
 	__HAL_TIM_SET_PRESCALER(p_handle, out_prescaler_value);
 	__HAL_TIM_SetAutoreload(p_handle, out_count_value);
 
-	__HAL_TIM_SetCompare(p_handle, channel, (out_count_value * duty / 100)); // 假设使用通道1	//PWM_Ultra_B
+	pluse = out_count_value * duty / 100;
+	__HAL_TIM_SetCompare(p_handle, channel, pluse); // 假设使用通道1	//PWM_Ultra_B
 
     // 更新并启动定时器
 	HAL_TIM_Base_Start(p_handle);

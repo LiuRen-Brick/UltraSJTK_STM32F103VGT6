@@ -9,7 +9,7 @@
 #include "adc.h"
 
 #define DEV_ADC			&hadc1
-#define DEV_LEN			4
+#define DEV_LEN			5
 #define ADC_DMA_CH		DMA_FLAG_TC1
 #define TEMPTURENUM		161
 #define FILTERNUM		15
@@ -70,7 +70,7 @@ float CurrentFront;
 float CurrentAfter;
 float CoreTempture;
 
-static float SampleVolFilter(float* buf,uint8_t len);
+static float SampleVolFilter(float* buff,uint8_t len);
 
 float look1_iflf_binlxpw(float u0, const float bp0[], const float table[], uint32_t maxIndex)
 {
@@ -117,11 +117,9 @@ float look1_iflf_binlxpw(float u0, const float bp0[], const float table[], uint3
 
 void DevADC1Func_Init(void)
 {
-	HAL_ADCEx_Calibration_Start(DEV_ADC);
-	HAL_ADC_Start_DMA(DEV_ADC, (uint32_t *)&ADC1SampleVal, DEV_LEN);
+	HAL_ADCEx_Calibration_Start(&hadc1);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADC1SampleVal, DEV_LEN);
 }
-
-
 
 void DevADC1Func_Main(void)
 {
@@ -129,17 +127,11 @@ void DevADC1Func_Main(void)
 	float TemptureVol,CurrentFrontVol,CurrentAfterVol,CoreVol_Temp,TemptureRes;
 	static uint8_t sCount = 0;
 
-	if(__HAL_DMA_GET_FLAG(&hadc1,ADC_DMA_CH) == SET)
-	{
-	   __HAL_DMA_CLEAR_FLAG(DEV_ADC,ADC_DMA_CH);
-	   HAL_ADC_Start_DMA(DEV_ADC, (uint32_t *)&ADC1SampleVal, DEV_LEN);
-	}
-
-	gain = ADC1SampleVal[4] * 3.3 / 4096 / 1.2;
-	TemptureVol_Temp[sCount] = (float)ADC1SampleVal[0] * 3.3f / 4096.0f * gain;
-	CurrentFrontVol_Temp[sCount] = (float)ADC1SampleVal[1] * 3.3f / 4096.0f * gain;
-	CurrentAfterVol_Temp[sCount] = (float)ADC1SampleVal[2] * 3.3f / 4096.0f * gain;
-	CoreVol_Temp =  (float)ADC1SampleVal[3] * 3300.0f / 4096.0f * gain;
+	gain = ADC1SampleVal[4] * 3.3 / 4095 / 1.2;
+	TemptureVol_Temp[sCount] = (float)ADC1SampleVal[0] * 3.3f / 4095.0f;
+	CurrentFrontVol_Temp[sCount] = (float)ADC1SampleVal[1] * 3.3f / 4095.0f  / gain;
+	CurrentAfterVol_Temp[sCount] = (float)ADC1SampleVal[2] * 3.3f / 4095.0f  / gain;
+	CoreVol_Temp =  (float)ADC1SampleVal[3] * 3.3f / 4095.0f / gain;
 
 	sCount++;
 	if(sCount >= 15)
@@ -150,39 +142,36 @@ void DevADC1Func_Main(void)
 	TemptureVol = SampleVolFilter(TemptureVol_Temp,FILTERNUM);
 	CurrentFrontVol = SampleVolFilter(CurrentFrontVol_Temp,FILTERNUM);
 	CurrentAfterVol = SampleVolFilter(CurrentAfterVol_Temp,FILTERNUM);
-	TemptureRes = (10000.0f * TemptureVol)/(3.3 - TemptureVol);
+	TemptureRes = (10000.0f * TemptureVol) / (3.3f - TemptureVol);
 
-	SampleTemp = look1_iflf_binlxpw(TemptureRes,INP_HWTemp_R,OUT_HWTemp_T,TEMPTURENUM);
-	CurrentFront = CurrentFrontVol * 50.0f * 100.0f;
+	SampleTemp = look1_iflf_binlxpw(TemptureRes,INP_HWTemp_R,OUT_HWTemp_T,TEMPTURENUM - 1);
+	CurrentFront = (CurrentFrontVol - 1.14) / 50.0f * 100.0f;			//CurrentFrontVol * GAIN(50) / 10mΩ(0.01);
 	CurrentAfter = CurrentAfterVol / 4.7f * 50.0f * 100.0f;
-	CoreTempture = (CoreVol_Temp - 1350) * 4.3f + 25.0f;
+	CoreTempture = (1.43 - CoreVol_Temp) / 0.0043f + 25.0f;
 }
 
-static float SampleVolFilter(float* buf,uint8_t len)
+static float SampleVolFilter(float* buff,uint8_t len)
 {
-	float vol,vol_sum;
-	float vol_temp;
-	uint8_t tag_i = 0,tag_j = 0;
+	float vol_max,vol_min;
+	float vol_sum = 0;
+	uint8_t tag_i = 0;
 
-	for(tag_i = 0;tag_i < (len - 1);tag_i++)
+	vol_max = buff[0];
+	vol_min = buff[0];
+
+	for(tag_i = 0;tag_i < len;tag_i++)
 	{
-		for(tag_j = 0;tag_j < (len - tag_i - 1);tag_j++)
+		if(buff[tag_i] < vol_min)
 		{
-			if(buf[tag_j] > buf[tag_j+1])
-			{
-				vol_temp = buf[tag_j];
-				buf[tag_j] = buf[tag_j+1];
-				buf[tag_j+1] = vol_temp;
-			}
+			vol_min = buff[tag_i];
+		}else if(buff[tag_i] > vol_max)
+		{
+			vol_max = buff[tag_i];
 		}
+
+		vol_sum += buff[tag_i];
 	}
 
-	for(tag_i = 0;tag_i < len-2;tag_i++)
-	{
-		vol_sum += buf[tag_i+1];
-	}
-	vol = (uint16_t)(vol_sum/(len-2));
-
-	return vol;
+	return (vol_sum - vol_max - vol_min) / (len -2);
 }
 

@@ -1,4 +1,4 @@
 ../Devices/dev_flash.c:14:19:DevFlash_Write	3
 ../Devices/dev_flash.c:41:6:DevFlash_Read	2
-../Devices/dev_flash.c:58:6:DevParam_Init	4
-../Devices/dev_flash.c:84:6:DevFlashWrite_Main	4
+../Devices/dev_flash.c:58:6:DevParam_Init	14
+../Devices/dev_flash.c:132:6:DevFlashWrite_Main	4

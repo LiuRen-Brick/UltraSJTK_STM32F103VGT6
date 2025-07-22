@@ -22,6 +22,9 @@ static void DevScreen_SetUltraVibra(uint8_t *buff);
 static void DevScreen_SetUltraDuty(uint8_t *buff);
 static void DevScreen_SetUltraPeriod(uint8_t *buff);
 static void DevScreen_SetUltraWork(uint8_t *buff);
+static void DevScreen_SetUltraChEn(uint8_t *buff);
+static void DevScreen_SetUltraModule(uint8_t *buff);
+static void DevScreen_SetPowerLevel(uint8_t * buff);
 
 static const DevScreenCmdFuncType dev_screen_cmd[DevScreenCmdMax] =
 {
@@ -31,6 +34,9 @@ static const DevScreenCmdFuncType dev_screen_cmd[DevScreenCmdMax] =
 	[DevScreenCmd_SetUltraDuty] = DevScreen_SetUltraDuty,
 	[DevScreenCmd_SetUltraPeriod] = DevScreen_SetUltraPeriod,
 	[DevScreenCmd_SetUltraWork] = DevScreen_SetUltraWork,
+	[DevScreenCmd_SetUltraChEn] = DevScreen_SetUltraChEn,
+	[DevScreenCmd_SetUltraModule] = DevScreen_SetUltraModule,
+	[DevScreenCmd_SetUltraPower] = DevScreen_SetPowerLevel,
 };
 
 static void DevScreen_StartorStop(uint8_t *buff)
@@ -91,8 +97,15 @@ static void DevScreen_SetUltraDuty(uint8_t *buff)
 
 		if(pluse_duty_temp != DevParamRead.UltraParam.PluseDuty[tag_i])
 		{
-			DevParamRead.UltraParam.PluseDuty[tag_i] = pluse_duty_temp;
 			FlashSaveFlg = 1;
+			if(pluse_duty_temp == 100)
+			{
+				DevParamRead.UltraParam.PluseDuty[tag_i] = 101;
+			}else
+			{
+				DevParamRead.UltraParam.PluseDuty[tag_i] = pluse_duty_temp;
+			}
+			DevPwm_LoadDuty(tag_i,DevParamRead.UltraParam.PluseDuty[tag_i]);
 		}
 	}
 }
@@ -115,8 +128,12 @@ static void DevScreen_SetUltraPeriod(uint8_t *buff)
 			period_temp = ((uint16_t)(buff[temp] & 0x0f) << 8) | buff[temp+1];
 		}
 
-		FlashSaveFlg = (DevParamRead.UltraParam.PlusePeriod[tag_i] != period_temp) ? 1 : FlashSaveFlg;
-		DevParamRead.UltraParam.PlusePeriod[tag_i] = period_temp;
+		if(DevParamRead.UltraParam.PlusePeriod[tag_i] != period_temp)
+		{
+			FlashSaveFlg = 1;
+			DevParamRead.UltraParam.PlusePeriod[tag_i] = period_temp;
+			DevPwm_LoadPeriod(tag_i,period_temp);
+		}
 	}
 }
 
@@ -132,6 +149,41 @@ static void DevScreen_SetUltraWork(uint8_t *buff)
 		FlashSaveFlg = 1;
 		DevParamRead.UltraParam.StimuTime = stimu_temp;
 		DevParamRead.UltraParam.IdleTime = idle_temp;
+	}
+}
+
+static void DevScreen_SetUltraChEn(uint8_t *buff)
+{
+	uint8_t tag_i = 0;
+
+	for(tag_i = 0;tag_i < ULTRACHNUM;tag_i++)
+	{
+		if(DevParamRead.UltraParam.UltraEn[tag_i] != buff[tag_i])
+		{
+			FlashSaveFlg = 1;
+			DevParamRead.UltraParam.UltraEn[tag_i] = buff[tag_i];
+		}
+	}
+}
+
+static void DevScreen_SetUltraModule(uint8_t * buff)
+{
+	if(DevParamRead.UltraParam.UltraWorkModule == buff[0])
+	{
+		FlashSaveFlg = 1;
+		DevParamRead.UltraParam.UltraWorkModule = (buff[0] == 0) ? 2 : buff[0];
+	}
+
+}
+
+static void DevScreen_SetPowerLevel(uint8_t * buff)
+{
+	if(DevParamRead.UltraParam.UltraPowerLevel != buff[0])
+	{
+		FlashSaveFlg = 1;
+		DevParamRead.UltraParam.UltraPowerLevel = (buff[0] > 5) ? 0 : buff[0];
+
+		DevAD5160_ValueLoad(DevParamRead.UltraParam.UltraPowerLevel);
 	}
 }
 
@@ -191,4 +243,20 @@ inline uint16_t DevWork_IdleTimeGet(void)
 
 	idle_time = (DevParamRead.UltraParam.IdleTime == 0xFFFF) ? 2500 : DevParamRead.UltraParam.IdleTime;
 	return idle_time;
+}
+
+inline uint8_t DevWork_ModuleGet(void)
+{
+	uint8_t work_module = 0;
+
+	work_module = (DevParamRead.UltraParam.UltraWorkModule == 0xFFFF) ? 2 : DevParamRead.UltraParam.UltraWorkModule;
+
+	return work_module;
+}
+
+inline uint8_t DevUltra_StatGet(uint8_t ch)
+{
+	uint8_t sta = (DevParamRead.UltraParam.UltraEn[ch] == 0xFF) ? 1 : DevParamRead.UltraParam.UltraEn[ch];
+
+	return sta;
 }

@@ -40,6 +40,6 @@ typedef enum
 }AD9833_MaxTable;
 
 void DevAD9833Set_Init(void);
-void DevAd9833Set_Main(void);
+void DevAD9833Set_Main(void);
 
 #endif /* DEV_AD9833_H_ */

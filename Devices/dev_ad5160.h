@@ -17,7 +17,8 @@ typedef enum
 	AD5160_MaxCh,
 }AD5160_MaxTable;
 
+void DevAD5160_ValueLoad(uint8_t power_level);
 void DevAD5160Func_Init(void);
-void DevAD5160Func_Main(uint8_t ch,uint8_t data);
+void DevAD5160Func_Main(void);
 
 #endif /* DEV_AD5160_H_ */

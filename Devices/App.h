@@ -18,9 +18,12 @@
 #define DEVWORKSTOP		0
 #define DEVWORKSTART	1
 
-
 #define ULTRACHNUM		8
-#define ULTRAPARAMSIZE  32
+#define ULTRAPARAMSIZE  40
+
+#define SYNCMODE	1
+#define ALTERMODE	2
+#define CYCLEMODE	3
 
 typedef union
 {
@@ -31,11 +34,14 @@ typedef union
 		uint16_t Freq_Param[ULTRACHNUM];
 		uint16_t VibraEnableFlg;
 		uint16_t Vibra_Param;
-		uint8_t PluseDuty[ULTRACHNUM];				//脉冲占空比
+		uint8_t  PluseDuty[ULTRACHNUM];				//脉冲占空比
 		uint16_t PlusePeriod[ULTRACHNUM];		    //脉冲周期
-		uint16_t StimuTime;					//刺激时间
-		uint16_t IdleTime;					//空闲时间
-		uint16_t Receive[3];
+		uint16_t StimuTime;							//刺激时间
+		uint16_t IdleTime;							//空闲时间
+		uint8_t  UltraEn[ULTRACHNUM];
+		uint16_t UltraWorkModule;
+		uint16_t UltraPowerLevel;
+		uint16_t Reserved[5];
 	}UltraParam;
 	uint16_t UltraParamBuff[ULTRAPARAMSIZE];
 }Device_Param;

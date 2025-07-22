@@ -1,3 +1,6 @@
-../Devices/App.c:46:6:DevSystem_Init	8	static
-../Devices/App.c:58:6:AppMainFunc	16	static
-../Devices/App.c:129:6:UltraParamReload	8	static
+../Devices/App.c:51:6:DevSystem_Init	8	static
+../Devices/App.c:64:6:AppMainFunc	16	static
+../Devices/App.c:119:6:UltraParamReload	24	static
+../Devices/App.c:145:13:UltraWorkModule_SyncMode	16	static
+../Devices/App.c:179:13:UltraWorkModule_AlternateMode	16	static
+../Devices/App.c:243:13:UltraWorkModule_CycleMode	16	static

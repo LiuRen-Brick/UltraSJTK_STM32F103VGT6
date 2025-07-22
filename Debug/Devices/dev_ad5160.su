@@ -1,7 +1,8 @@
-../Devices/dev_ad5160.c:38:13:AD5160_Delay	16	static
-../Devices/dev_ad5160.c:45:13:AD5160_CSSet	16	static
-../Devices/dev_ad5160.c:50:13:AD5160_CLKSet	16	static
-../Devices/dev_ad5160.c:55:13:AD5160_DATASet	16	static
-../Devices/dev_ad5160.c:60:13:AD5160_SendData	24	static
-../Devices/dev_ad5160.c:86:6:DevAD5160Func_Init	16	static
-../Devices/dev_ad5160.c:97:6:DevAD5160Func_Main	16	static
+../Devices/dev_ad5160.c:46:13:AD5160_Delay	16	static
+../Devices/dev_ad5160.c:53:13:AD5160_CSSet	16	static
+../Devices/dev_ad5160.c:58:13:AD5160_CLKSet	16	static
+../Devices/dev_ad5160.c:63:13:AD5160_DATASet	16	static
+../Devices/dev_ad5160.c:68:13:AD5160_SendData	24	static
+../Devices/dev_ad5160.c:95:6:DevAD5160_ValueLoad	16	static
+../Devices/dev_ad5160.c:103:6:DevAD5160Func_Init	16	static
+../Devices/dev_ad5160.c:117:6:DevAD5160Func_Main	16	static

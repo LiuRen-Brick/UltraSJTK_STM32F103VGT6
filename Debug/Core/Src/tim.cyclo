@@ -10,5 +10,5 @@
 ../Core/Src/tim.c:516:6:MX_TIM11_Init	4
 ../Core/Src/tim.c:557:6:MX_TIM12_Init	5
 ../Core/Src/tim.c:604:6:HAL_TIM_Base_MspInit	12
-../Core/Src/tim.c:729:6:HAL_TIM_MspPostInit	11
-../Core/Src/tim.c:931:6:HAL_TIM_Base_MspDeInit	12
+../Core/Src/tim.c:733:6:HAL_TIM_MspPostInit	11
+../Core/Src/tim.c:935:6:HAL_TIM_Base_MspDeInit	12

@@ -1,6 +1,6 @@
 ################################################################################
-# 自动生成的文件。不要编辑！
-# Toolchain: GNU Tools for STM32 (12.3.rel1)
+# Automatically-generated file. Do not edit!
+# Toolchain: GNU Tools for STM32 (13.3.rel1)
 ################################################################################
 
 -include ../makefile.init
@@ -54,29 +54,29 @@ OBJDUMP_LIST += \
 UltraTherapy_SJTK_F103VGT6.list \
 
 
-# 所有目标
+# All Target
 all: main-build
 
-# 主构建目标
+# Main-build Target
 main-build: UltraTherapy_SJTK_F103VGT6.elf secondary-outputs
 
-# 工具调用
-UltraTherapy_SJTK_F103VGT6.elf UltraTherapy_SJTK_F103VGT6.map: $(OBJS) $(USER_OBJS) D:\STM32CubeIDE\workspace_1.17.0\UltraTherapy_SJTK_F103VGT6\STM32F103VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "UltraTherapy_SJTK_F103VGT6.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"D:\STM32CubeIDE\workspace_1.17.0\UltraTherapy_SJTK_F103VGT6\STM32F103VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="UltraTherapy_SJTK_F103VGT6.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-	@echo '已结束构建目标： $@'
+# Tool invocations
+UltraTherapy_SJTK_F103VGT6.elf UltraTherapy_SJTK_F103VGT6.map: $(OBJS) $(USER_OBJS) D:\STM32CubeIDE\workspace_1.19.0\UltraTherapy_SJTK_F103VGT6\STM32F103VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "UltraTherapy_SJTK_F103VGT6.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"D:\STM32CubeIDE\workspace_1.19.0\UltraTherapy_SJTK_F103VGT6\STM32F103VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="UltraTherapy_SJTK_F103VGT6.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	@echo 'Finished building target: $@'
 	@echo ' '
 
 default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	arm-none-eabi-size  $(EXECUTABLES)
-	@echo '已结束构建： $@'
+	@echo 'Finished building: $@'
 	@echo ' '
 
 UltraTherapy_SJTK_F103VGT6.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "UltraTherapy_SJTK_F103VGT6.list"
-	@echo '已结束构建： $@'
+	@echo 'Finished building: $@'
 	@echo ' '
 
-# 其他目标
+# Other Targets
 clean:
 	-$(RM) UltraTherapy_SJTK_F103VGT6.elf UltraTherapy_SJTK_F103VGT6.list UltraTherapy_SJTK_F103VGT6.map default.size.stdout
 	-@echo ' '

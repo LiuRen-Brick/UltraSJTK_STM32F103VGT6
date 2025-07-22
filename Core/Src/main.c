@@ -47,7 +47,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+uint32_t TaskCount = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -106,6 +106,8 @@ int main(void)
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   DevSystem_Init();
+  HAL_TIM_Base_Start_IT(&htim6);
+  HAL_Delay(10);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -115,12 +117,15 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  if(TaskCount > 100)
+	  {
+		  DevAD5160Func_Main();
+		  DevAD9833Set_Main();
+		  DevADC1Func_Main();
+		  DevFlashWrite_Main();
+		  DevPwmFunc_Main();
+	  }
 	  AppMainFunc();
-	  DevAd9833Set_Main();
-	  DevADC1Func_Main();
-	  DevFlashWrite_Main();
-	  DevPwmFunc_Main();
-
   }
   /* USER CODE END 3 */
 }
@@ -157,14 +162,14 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV8;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV4;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
@@ -172,7 +177,21 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
 
+  /* USER CODE END Callback 0 */
+
+  /* USER CODE BEGIN Callback 1 */
+	//100us
+	if(htim->Instance == TIM6)
+	{
+		UltraWorkTime++;
+		TaskCount++;
+	}
+  /* USER CODE END Callback 1 */
+}
 /* USER CODE END 4 */
 
 /**
@@ -189,8 +208,7 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
-
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
