@@ -1,6 +1,7 @@
-../Devices/App.c:51:6:DevSystem_Init	1
-../Devices/App.c:64:6:AppMainFunc	3
-../Devices/App.c:119:6:UltraParamReload	3
-../Devices/App.c:145:13:UltraWorkModule_SyncMode	7
-../Devices/App.c:179:13:UltraWorkModule_AlternateMode	16
-../Devices/App.c:243:13:UltraWorkModule_CycleMode	6
+../Devices/App.c:52:6:DevSystem_Init	1
+../Devices/App.c:65:6:AppMainFunc	5
+../Devices/App.c:121:6:UltraParamReload	3
+../Devices/App.c:147:13:UltraWorkModule_SyncMode	7
+../Devices/App.c:181:13:UltraWorkModule_AlternateMode	16
+../Devices/App.c:245:13:UltraWorkModule_AlternateMode2	13
+../Devices/App.c:307:13:UltraWorkModule_CycleMode	6

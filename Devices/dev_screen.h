@@ -32,6 +32,7 @@ typedef enum
 
 void DevUart_Init(void);
 void HAL_UART_IdleCallback(UART_HandleTypeDef *huart);
+void DevScreenSendData(uint8_t cmd,uint8_t val);
 
 uint8_t DevMotor_StaGet(void);
 uint8_t DevUltra_StatGet(uint8_t ch);

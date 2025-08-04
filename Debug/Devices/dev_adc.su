@@ -1,4 +1,4 @@
 ../Devices/dev_adc.c:75:7:look1_iflf_binlxpw	48	static
 ../Devices/dev_adc.c:118:6:DevADC1Func_Init	8	static
 ../Devices/dev_adc.c:124:6:DevADC1Func_Main	40	static
-../Devices/dev_adc.c:153:14:SampleVolFilter	40	static
+../Devices/dev_adc.c:165:14:SampleVolFilter	40	static

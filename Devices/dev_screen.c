@@ -14,6 +14,8 @@ uint8_t ScreenRxBuff2[DEV_SCREEN_RXBUFF_SIZE] = {0};
 uint8_t *active_buff = ScreenRxBuff1;
 uint8_t *passive_buff = ScreenRxBuff2;
 
+uint8_t ScreenTxBuff[9] = {0xEE,0xB5,0x30,0x00,0x00,0xFF,0xFC,0xFF,0xFF};
+
 typedef void (*DevScreenCmdFuncType)(uint8_t *buff);
 
 static void DevScreen_StartorStop(uint8_t *buff);
@@ -220,6 +222,14 @@ void HAL_UART_IdleCallback(UART_HandleTypeDef *huart)
 
 		ParamRefresh = 1;
 	}
+}
+
+void DevScreenSendData(uint8_t cmd,uint8_t val)
+{
+	ScreenTxBuff[2] = cmd;
+	ScreenTxBuff[3] = val;
+
+	HAL_UART_Transmit_DMA(DEV_SCREEN_UART_HANDLE, ScreenTxBuff, sizeof(ScreenTxBuff));
 }
 
 inline uint8_t DevMotor_StaGet(void)

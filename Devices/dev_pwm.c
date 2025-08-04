@@ -85,6 +85,11 @@ void DevPwmFunc_Init(void)
 	motor_level = DevParamRead.UltraParam.Vibra_Param;
 	MotorLevel = motor_level;
 
+	HAL_TIM_Base_Start(FAN_HANDLE);
+	HAL_TIM_PWM_Start(FAN_HANDLE, FAN_CHANNEL);
+
+	HAL_TIM_Base_Start(MOTOR_HANDLE);
+	HAL_TIM_PWM_Start(MOTOR_HANDLE, MOTOR_CHANNEL);
 	__HAL_TIM_SetCompare(MOTOR_HANDLE,MOTOR_CHANNEL,motor_level * MOTOR_STEP);
 }
 

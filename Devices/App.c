@@ -46,6 +46,7 @@ static uint16_t Motor_Gpio_Pin[ULTRACHNUM]  =
 static void UltraWorkModule_SyncMode(void);
 static void UltraWorkModule_AlternateMode(void);
 static void UltraWorkModule_CycleMode(void);
+static void UltraWorkModule_AlternateMode2(void);
 
 /*系统初始化*/
 void DevSystem_Init(void)
@@ -68,16 +69,12 @@ void AppMainFunc(void)
 
 	if(WorkSta == DEVWORKSTART)
 	{
-
-#if 1
-		HAL_GPIO_WritePin(Ultra_Gpio_Port[0], Ultra_Gpio_Pin[0], UltraEnFlg[0]);
-		HAL_GPIO_WritePin(Ultra_Gpio_Port[1], Ultra_Gpio_Pin[1], UltraEnFlg[1]);
-		HAL_GPIO_WritePin(Ultra_Gpio_Port[2], Ultra_Gpio_Pin[2], UltraEnFlg[2]);
-		HAL_GPIO_WritePin(Ultra_Gpio_Port[3], Ultra_Gpio_Pin[3], UltraEnFlg[3]);
-		HAL_GPIO_WritePin(Ultra_Gpio_Port[4], Ultra_Gpio_Pin[4], UltraEnFlg[4]);
-		HAL_GPIO_WritePin(Ultra_Gpio_Port[6], Ultra_Gpio_Pin[6], UltraEnFlg[5]);
-		HAL_GPIO_WritePin(Ultra_Gpio_Port[5], Ultra_Gpio_Pin[5], UltraEnFlg[6]);
-		HAL_GPIO_WritePin(Ultra_Gpio_Port[7], Ultra_Gpio_Pin[7], UltraEnFlg[7]);
+#if 0
+		for(tag_i = 0;tag_i < 8;tag_i++)
+		{
+			HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], UltraEnFlg[tag_i]);
+			HAL_GPIO_WritePin(Motor_Gpio_Port[tag_i], Motor_Gpio_Pin[tag_i], GPIO_PIN_RESET);
+		}
 #else
 		mode = WorkModule;
 
@@ -85,7 +82,7 @@ void AppMainFunc(void)
 		{
 		case SYNCMODE:
 			/*同步模式 8探头同时工作*/
-			UltraWorkModule_SyncMode();
+//			UltraWorkModule_SyncMode();
 			break;
 
 		case ALTERMODE:
@@ -95,7 +92,12 @@ void AppMainFunc(void)
 
 		case CYCLEMODE:
 			/*循环模式 8探头循环交替工作*/
-			UltraWorkModule_CycleMode();
+//			UltraWorkModule_CycleMode();
+			break;
+
+		case ALTERMODE2:
+			/*交替模式2 2探头为一组，交替运行*/
+//			UltraWorkModule_AlternateMode2();
 			break;
 
 		default:
@@ -186,7 +188,7 @@ static void UltraWorkModule_AlternateMode(void)
 		{
 			if((tag_i % 2) == 0)
 			{
-				HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], (GPIO_PinState)UltraEnFlg[tag_i]);
+//				HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], (GPIO_PinState)UltraEnFlg[tag_i]);
 				if(DevParamRead.UltraParam.VibraEnableFlg == 1)
 				{
 					HAL_GPIO_WritePin(Motor_Gpio_Port[tag_i], Motor_Gpio_Pin[tag_i], GPIO_PIN_SET);
@@ -210,7 +212,7 @@ static void UltraWorkModule_AlternateMode(void)
 		{
 			if((tag_i % 2) == 1)
 			{
-				HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], (GPIO_PinState)UltraEnFlg[tag_i]);
+//				HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], (GPIO_PinState)UltraEnFlg[tag_i]);
 				if(DevParamRead.UltraParam.VibraEnableFlg == 1)
 				{
 					HAL_GPIO_WritePin(Motor_Gpio_Port[tag_i], Motor_Gpio_Pin[tag_i], GPIO_PIN_SET);
@@ -236,6 +238,68 @@ static void UltraWorkModule_AlternateMode(void)
 
 /*
  *
+ *			8探头四组交替工作模式(2个为一组)
+ *
+ */
+
+static void UltraWorkModule_AlternateMode2(void)
+{
+	uint8_t tag_i = 0;
+	uint8_t group_id = 0;
+	uint32_t idle_start,idle_stop;
+	uint32_t alter_cycle = 0;
+
+	alter_cycle = (IdleTime + StimuTime) / 4;
+	group_id = UltraWorkTime / alter_cycle;
+	idle_start = ((group_id + 4) * StimuTime / 4) + group_id * IdleTime;
+	idle_stop = alter_cycle * (group_id + 1);
+
+	if((UltraWorkTime > idle_start) && (UltraWorkTime <= idle_stop))
+	{
+		group_id = 4;
+	}
+
+	switch(group_id)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+		for(tag_i = 0;tag_i < ULTRACHNUM;tag_i ++)
+		{
+			if((tag_i == (group_id * 2)) || (tag_i == (group_id * 2 + 1)))
+			{
+				HAL_GPIO_WritePin(Motor_Gpio_Port[tag_i], Motor_Gpio_Pin[tag_i], (GPIO_PinState)UltraEnFlg[tag_i]);
+				if(MotorEnableFlg == 1)
+				{
+					HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], GPIO_PIN_SET);
+				}
+			}else
+			{
+				HAL_GPIO_WritePin(Motor_Gpio_Port[tag_i], Motor_Gpio_Pin[tag_i], GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], GPIO_PIN_RESET);
+			}
+		}
+		break;
+	case 4:
+		for(tag_i = 0;tag_i < ULTRACHNUM;tag_i ++)
+		{
+			HAL_GPIO_WritePin(Motor_Gpio_Port[tag_i], Motor_Gpio_Pin[tag_i], GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], GPIO_PIN_RESET);
+		}
+		break;
+	default:
+		break;
+	}
+
+	if(UltraWorkTime > IdleTime + StimuTime)
+	{
+		UltraWorkTime;
+	}
+
+}
+/*
+ *
  *			8探头循环工作模式
  *
  */
@@ -253,16 +317,16 @@ static void UltraWorkModule_CycleMode(void)
 		HAL_GPIO_WritePin(Ultra_Gpio_Port[sCycleCh], Ultra_Gpio_Pin[sCycleCh], UltraEnFlg[sCycleCh]);
 		if(MotorEnableFlg == 1)
 		{
-			HAL_GPIO_WritePin(Ultra_Gpio_Port[sCycleCh], Ultra_Gpio_Pin[sCycleCh], GPIO_PIN_SET);
+			HAL_GPIO_WritePin(Motor_Gpio_Port[sCycleCh], Motor_Gpio_Pin[sCycleCh], GPIO_PIN_SET);
 		}
 	}else if((UltraWorkTime >= StimuTime) && (UltraWorkTime < ave_time))
 	{
 		HAL_GPIO_WritePin(Ultra_Gpio_Port[sCycleCh], Ultra_Gpio_Pin[sCycleCh], GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(Ultra_Gpio_Port[sCycleCh], Ultra_Gpio_Pin[sCycleCh], GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(Motor_Gpio_Port[sCycleCh], Motor_Gpio_Pin[sCycleCh], GPIO_PIN_RESET);
 	}else
 	{
 		HAL_GPIO_WritePin(Ultra_Gpio_Port[sCycleCh], Ultra_Gpio_Pin[sCycleCh], GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(Ultra_Gpio_Port[sCycleCh], Ultra_Gpio_Pin[sCycleCh], GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(Motor_Gpio_Port[sCycleCh], Motor_Gpio_Pin[sCycleCh], GPIO_PIN_RESET);
 		UltraWorkTime = 0;
 		sCycleCh++;
 	}

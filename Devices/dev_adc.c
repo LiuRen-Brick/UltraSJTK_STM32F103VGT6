@@ -126,6 +126,7 @@ void DevADC1Func_Main(void)
 	float gain = 1.0f;
 	float TemptureVol,CurrentFrontVol,CurrentAfterVol,CoreVol_Temp,TemptureRes;
 	static uint8_t sCount = 0;
+	static uint8_t sTempOver = 0;
 
 	gain = ADC1SampleVal[4] * 3.3 / 4095 / 1.2;
 	TemptureVol_Temp[sCount] = (float)ADC1SampleVal[0] * 3.3f / 4095.0f;
@@ -148,6 +149,17 @@ void DevADC1Func_Main(void)
 	CurrentFront = (CurrentFrontVol - 1.14) / 50.0f * 100.0f;			//CurrentFrontVol * GAIN(50) / 10mΩ(0.01);
 	CurrentAfter = CurrentAfterVol / 4.7f * 50.0f * 100.0f;
 	CoreTempture = (1.43 - CoreVol_Temp) / 0.0043f + 25.0f;
+
+	/*过温检测，超过80℃屏幕提示报警*/
+	if((SampleTemp > 80.0f) && (sTempOver == 0))
+	{
+		sTempOver = 1;
+		DevScreenSendData(0x30,sTempOver);
+	}else if((SampleTemp < 75.0f) && (sTempOver == 1))
+	{
+		sTempOver = 0;
+		DevScreenSendData(0x30,sTempOver);
+	}
 }
 
 static float SampleVolFilter(float* buff,uint8_t len)

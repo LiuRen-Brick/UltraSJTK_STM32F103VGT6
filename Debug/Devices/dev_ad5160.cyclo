@@ -1,8 +1,8 @@
-../Devices/dev_ad5160.c:46:13:AD5160_Delay	2
-../Devices/dev_ad5160.c:53:13:AD5160_CSSet	1
-../Devices/dev_ad5160.c:58:13:AD5160_CLKSet	1
-../Devices/dev_ad5160.c:63:13:AD5160_DATASet	1
-../Devices/dev_ad5160.c:68:13:AD5160_SendData	3
-../Devices/dev_ad5160.c:95:6:DevAD5160_ValueLoad	2
-../Devices/dev_ad5160.c:103:6:DevAD5160Func_Init	2
-../Devices/dev_ad5160.c:117:6:DevAD5160Func_Main	3
+../Devices/dev_ad5160.c:48:13:AD5160_Delay	2
+../Devices/dev_ad5160.c:55:13:AD5160_CSSet	1
+../Devices/dev_ad5160.c:60:13:AD5160_CLKSet	1
+../Devices/dev_ad5160.c:65:13:AD5160_DATASet	1
+../Devices/dev_ad5160.c:70:13:AD5160_SendData	3
+../Devices/dev_ad5160.c:97:6:DevAD5160_ValueLoad	2
+../Devices/dev_ad5160.c:105:6:DevAD5160Func_Init	2
+../Devices/dev_ad5160.c:119:6:DevAD5160Func_Main	3

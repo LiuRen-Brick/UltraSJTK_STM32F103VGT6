@@ -1,4 +1,4 @@
 ../Devices/dev_adc.c:75:7:look1_iflf_binlxpw	5
 ../Devices/dev_adc.c:118:6:DevADC1Func_Init	1
-../Devices/dev_adc.c:124:6:DevADC1Func_Main	2
-../Devices/dev_adc.c:153:14:SampleVolFilter	4
+../Devices/dev_adc.c:124:6:DevADC1Func_Main	6
+../Devices/dev_adc.c:165:14:SampleVolFilter	4

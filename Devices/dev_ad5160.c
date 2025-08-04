@@ -7,9 +7,11 @@
 
 #include "App.h"
 
-static uint8_t ResistCode[5] =
+#define POWERLEVELNUM	6
+
+static uint8_t ResistCode[POWERLEVELNUM] =
 {
-	0xFF, 0xC3, 0xA5, 0x87, 0x69
+	0xFF, 0xC3, 0xA5, 0x87, 0x69, 0x55
 };
 
 static uint16_t AD5160_CS_GPIO[AD5160_MaxCh] =
@@ -94,7 +96,7 @@ static void AD5160_SendData(uint8_t ch,uint8_t data)
 
 void DevAD5160_ValueLoad(uint8_t power_level)
 {
-	if(power_level < 5)
+	if(power_level < POWERLEVELNUM)
 	{
 		PowerLevel = power_level;
 	}
@@ -103,7 +105,7 @@ void DevAD5160_ValueLoad(uint8_t power_level)
 void DevAD5160Func_Init(void)
 {
 	uint8_t res_data = 165;
-	uint8_t tag_i;
+	uint8_t tag_i = 0;
 
 	PowerLevel = DevParamRead.UltraParam.UltraPowerLevel;
 	res_data = ResistCode[PowerLevel];

@@ -60,7 +60,7 @@ void DevParam_Init(void)
 	uint8_t tag_i = 0;
 	uint32_t read_addr = FLASH_SLAVE_ULTRAPARAM;
 
-	while(read_addr < (FLASH_SLAVE_ULTRAPARAM + PAGE_SIZE))
+	while(read_addr <= (FLASH_SLAVE_ULTRAPARAM + PAGE_SIZE))
 	{
 		DevFlash_Read(read_addr,DevParamRead.UltraParamBuff,ULTRAPARAMSIZE);
 		if(DevParamRead.UltraParam.WriteCount != 0xFFFFFFFF)
@@ -73,7 +73,7 @@ void DevParam_Init(void)
 			{
 				DevParamRead.UltraParam.WriteCount = 0;
 				break;
-			}else
+			}
 
 			FlashOffset -= (ULTRAPARAMSIZE * 2);
 			read_addr = FLASH_SLAVE_ULTRAPARAM + FlashOffset;

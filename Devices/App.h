@@ -24,6 +24,7 @@
 #define SYNCMODE	1
 #define ALTERMODE	2
 #define CYCLEMODE	3
+#define ALTERMODE2	4
 
 typedef union
 {
