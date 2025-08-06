@@ -155,7 +155,7 @@ void DevADC1Func_Main(void)
 	{
 		sTempOver = 1;
 		DevScreenSendData(0x30,sTempOver);
-	}else if((SampleTemp < 75.0f) && (sTempOver == 1))
+	}else if((SampleTemp < 77.0f) && (sTempOver == 1))
 	{
 		sTempOver = 0;
 		DevScreenSendData(0x30,sTempOver);

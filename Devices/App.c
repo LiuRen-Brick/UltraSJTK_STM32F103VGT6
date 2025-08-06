@@ -64,6 +64,7 @@ void DevSystem_Init(void)
 
 void AppMainFunc(void)
 {
+	static uint8_t sWorkSta_old = DEVWORKSTART;
 	uint8_t tag_i = 0;
 	uint8_t mode = 0;
 
@@ -82,7 +83,7 @@ void AppMainFunc(void)
 		{
 		case SYNCMODE:
 			/*同步模式 8探头同时工作*/
-//			UltraWorkModule_SyncMode();
+			UltraWorkModule_SyncMode();
 			break;
 
 		case ALTERMODE:
@@ -92,32 +93,42 @@ void AppMainFunc(void)
 
 		case CYCLEMODE:
 			/*循环模式 8探头循环交替工作*/
-//			UltraWorkModule_CycleMode();
+			UltraWorkModule_CycleMode();
 			break;
 
 		case ALTERMODE2:
 			/*交替模式2 2探头为一组，交替运行*/
-//			UltraWorkModule_AlternateMode2();
+			UltraWorkModule_AlternateMode2();
 			break;
 
 		default:
 			UltraWorkModule_AlternateMode();
 			break;
 		}
+
+		sWorkSta_old = DEVWORKSTART;
 #endif
 	}else
 	{
 		/*震动马达、超声复位*/
-		for(tag_i = 0;tag_i < ULTRACHNUM;tag_i++)
+		if(sWorkSta_old == DEVWORKSTART)
 		{
-			HAL_GPIO_WritePin(Motor_Gpio_Port[tag_i], Motor_Gpio_Pin[tag_i], GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], GPIO_PIN_RESET);
+			for(tag_i = 0;tag_i < ULTRACHNUM;tag_i++)
+			{
+				HAL_GPIO_WritePin(Motor_Gpio_Port[tag_i], Motor_Gpio_Pin[tag_i], GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], GPIO_PIN_RESET);
+			}
+			sWorkSta_old = DEVWORKSTOP;
 		}
 	}
-
 	UltraParamReload();			//超声参数装载
 }
 
+/*
+ *
+ * 			超声参数重新装填
+ *
+ */
 void UltraParamReload(void)
 {
 	uint8_t tag_i = 0;
@@ -177,7 +188,6 @@ static void UltraWorkModule_SyncMode(void)
  *			8探头两组交替工作模式(4个为一组)
  *
  */
-
 static void UltraWorkModule_AlternateMode(void)
 {
 	uint8_t tag_i = 0;
@@ -186,9 +196,10 @@ static void UltraWorkModule_AlternateMode(void)
 	{
 		for(tag_i = 0;tag_i < ULTRACHNUM;tag_i++)
 		{
+			//偶数探头超声控制
 			if((tag_i % 2) == 0)
 			{
-//				HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], (GPIO_PinState)UltraEnFlg[tag_i]);
+				HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], (GPIO_PinState)UltraEnFlg[tag_i]);
 				if(DevParamRead.UltraParam.VibraEnableFlg == 1)
 				{
 					HAL_GPIO_WritePin(Motor_Gpio_Port[tag_i], Motor_Gpio_Pin[tag_i], GPIO_PIN_SET);
@@ -210,9 +221,10 @@ static void UltraWorkModule_AlternateMode(void)
 	{
 		for(tag_i = 0;tag_i < ULTRACHNUM;tag_i++)
 		{
+			//奇数探头超声控制
 			if((tag_i % 2) == 1)
 			{
-//				HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], (GPIO_PinState)UltraEnFlg[tag_i]);
+				HAL_GPIO_WritePin(Ultra_Gpio_Port[tag_i], Ultra_Gpio_Pin[tag_i], (GPIO_PinState)UltraEnFlg[tag_i]);
 				if(DevParamRead.UltraParam.VibraEnableFlg == 1)
 				{
 					HAL_GPIO_WritePin(Motor_Gpio_Port[tag_i], Motor_Gpio_Pin[tag_i], GPIO_PIN_SET);
@@ -241,7 +253,6 @@ static void UltraWorkModule_AlternateMode(void)
  *			8探头四组交替工作模式(2个为一组)
  *
  */
-
 static void UltraWorkModule_AlternateMode2(void)
 {
 	uint8_t tag_i = 0;
@@ -294,7 +305,7 @@ static void UltraWorkModule_AlternateMode2(void)
 
 	if(UltraWorkTime > IdleTime + StimuTime)
 	{
-		UltraWorkTime;
+		UltraWorkTime = 0;
 	}
 
 }
@@ -303,23 +314,22 @@ static void UltraWorkModule_AlternateMode2(void)
  *			8探头循环工作模式
  *
  */
-
 static void UltraWorkModule_CycleMode(void)
 {
 	uint32_t sum_time,ave_time = 0;
 	static uint8_t sCycleCh = 0;
 
-	sum_time = StimuTime + IdleTime;
+	sum_time = (StimuTime + IdleTime) * 10;
 	ave_time = sum_time / ULTRACHNUM;
 
-	if(UltraWorkTime < StimuTime)
+	if(UltraWorkTime < (StimuTime * 10))
 	{
 		HAL_GPIO_WritePin(Ultra_Gpio_Port[sCycleCh], Ultra_Gpio_Pin[sCycleCh], UltraEnFlg[sCycleCh]);
 		if(MotorEnableFlg == 1)
 		{
 			HAL_GPIO_WritePin(Motor_Gpio_Port[sCycleCh], Motor_Gpio_Pin[sCycleCh], GPIO_PIN_SET);
 		}
-	}else if((UltraWorkTime >= StimuTime) && (UltraWorkTime < ave_time))
+	}else if((UltraWorkTime >= (StimuTime * 10)) && (UltraWorkTime < ave_time))
 	{
 		HAL_GPIO_WritePin(Ultra_Gpio_Port[sCycleCh], Ultra_Gpio_Pin[sCycleCh], GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(Motor_Gpio_Port[sCycleCh], Motor_Gpio_Pin[sCycleCh], GPIO_PIN_RESET);

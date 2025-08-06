@@ -47,6 +47,7 @@ local UltraChEnableId = {[0] = 0,0,0,0,0,0,0,0,0}
 --初始化函数
 function on_init()
 set_visiable(screen_main,6,0)
+--set_visiable(screen_record,8,0)
 DevParamInit()
 start_timer(0,1000,0,0)
 stop_timer(4)
@@ -110,24 +111,33 @@ function on_timer(timer_id)
 	if timer_id == 2 then										--第二次发送指令
 		if CmdSet == screen_main then
 			SendWorkStartStop()
+ 		stop_timer(2)	
 		elseif CmdSet == screen_vibraset then
 			SendVibraParam()
+ 			stop_timer(2)	
 		elseif CmdSet == screen_freqset then
 			SendFreqParam()
+ 			stop_timer(2)	
 		elseif CmdSet == screen_pluse then
 			SendPluseParam()
+ 			stop_timer(2)	
 		elseif CmdSet == screen_duty then
 			SendDutyParam()
+ 			stop_timer(2)	
 		elseif CmdSet == screen_stimutime then
 			SendStiumParam()
+ 			stop_timer(2)	
 		elseif CmdSet == screen_ultraenable then
 			SendUltraEnable()
+ 			stop_timer(2)	
 		elseif CmdSet == screen_workmodule then
 			SendWorkModule()
+ 			CmdSet = screen_stimutime
 		elseif CmdSet == screen_powerlevel then
 			SendPowerLevel()
+ 			stop_timer(2)	
 		end
-		stop_timer(2)
+		
 	end
 
 	if timer_id == 3 then
@@ -353,7 +363,7 @@ function on_control_notify(screen,control,value)
 				set_value(screen_workmodule,2,1)
  				WorkModule = 2	
 			end
- 			CmdSet = flash_workmodule	
+ 			CmdSet = screen_workmodule	
  			SendWorkModule()	
  			write_flash(flash_workmodule,FlashSaveBuff)	
 			start_timer(2,100,0,0)	
@@ -720,6 +730,14 @@ function UltraChEnable(control,value)
 			UltraChEnableNum = UltraChEnableNum + 1
 			UltraChEnbaleFlg[control - 2] = 1
 		else
+			for i=1,8 do
+				if UltraChEnableId[i-1] == control then
+					for j=i,UltraChEnableNum do
+						UltraChEnableId[j-1] = UltraChEnableId[j]
+					end
+					break
+				end
+			end
 			UltraChEnableNum = UltraChEnableNum - 1	
 			UltraChEnableId[UltraChEnableNum] = 0
 	 		UltraChEnbaleFlg[control - 2] = 0	

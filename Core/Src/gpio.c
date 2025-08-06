@@ -76,9 +76,9 @@ void MX_GPIO_Init(void)
                           |AD9833CH3_SCLK_Pin|AD9833CH3_SDATA_Pin|AD9833CH3_FSYNC_Pin|AD9833CH2_SCLK_Pin
                           |AD9833CH2_SDATA_Pin|AD9833CH2_FSYNC_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : AD5160CH1_DATA_Pin AD5160CH1_CLK_Pin AD5160CH2_CS_Pin AD5160CH1_CS_Pin */
-  GPIO_InitStruct.Pin = AD5160CH1_DATA_Pin|AD5160CH1_CLK_Pin|AD5160CH2_CS_Pin|AD5160CH1_CS_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  /*Configure GPIO pins : AD5160CH1_DATA_Pin AD5160CH1_CLK_Pin */
+  GPIO_InitStruct.Pin = AD5160CH1_DATA_Pin|AD5160CH1_CLK_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
@@ -115,11 +115,16 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : AD5160CH2_DATA_Pin AD5160CH2_CLK_Pin AD9833CH1_SCLK_Pin AD9833CH1_SDATA_Pin
-                           AD9833CH1_FSYNC_Pin */
-  GPIO_InitStruct.Pin = AD5160CH2_DATA_Pin|AD5160CH2_CLK_Pin|AD9833CH1_SCLK_Pin|AD9833CH1_SDATA_Pin
-                          |AD9833CH1_FSYNC_Pin;
+  /*Configure GPIO pins : AD5160CH2_CS_Pin AD5160CH1_CS_Pin */
+  GPIO_InitStruct.Pin = AD5160CH2_CS_Pin|AD5160CH1_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : AD5160CH2_DATA_Pin AD5160CH2_CLK_Pin */
+  GPIO_InitStruct.Pin = AD5160CH2_DATA_Pin|AD5160CH2_CLK_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -150,6 +155,13 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : AD9833CH1_SCLK_Pin AD9833CH1_SDATA_Pin AD9833CH1_FSYNC_Pin */
+  GPIO_InitStruct.Pin = AD9833CH1_SCLK_Pin|AD9833CH1_SDATA_Pin|AD9833CH1_FSYNC_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 

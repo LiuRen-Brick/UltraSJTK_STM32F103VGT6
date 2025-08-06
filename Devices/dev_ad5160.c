@@ -123,11 +123,17 @@ void DevAD5160Func_Main(void)
 
 	if(PowerLevel != PowerLevel_old)
 	{
+		HAL_GPIO_WritePin(V36CH1_4_EN_GPIO_Port, V36CH1_4_EN_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(V36CH5_8_EN_GPIO_Port, V36CH5_8_EN_Pin, GPIO_PIN_RESET);
+		HAL_Delay(20);
 		res_data = ResistCode[PowerLevel];
 		for(tag_i = 0;tag_i < AD5160_MaxCh;tag_i++)
 		{
 			AD5160_SendData(tag_i,res_data);
 		}
 		PowerLevel_old = PowerLevel;
+		HAL_Delay(20);
+		HAL_GPIO_WritePin(V36CH1_4_EN_GPIO_Port, V36CH1_4_EN_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(V36CH5_8_EN_GPIO_Port, V36CH5_8_EN_Pin, GPIO_PIN_SET);
 	}
 }

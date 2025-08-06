@@ -806,3 +806,5 @@
 
 #define  _TXT_DIS__操作记录_TEXT_DISPLAY4                                          7
 
+#define  _RTC_操作记录_RTC1                                                        8
+

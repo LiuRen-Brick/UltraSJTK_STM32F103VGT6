@@ -41,12 +41,20 @@ static const DevScreenCmdFuncType dev_screen_cmd[DevScreenCmdMax] =
 	[DevScreenCmd_SetUltraPower] = DevScreen_SetPowerLevel,
 };
 
+/* @brief:	屏幕控制超声输出
+ * @param:	buff-指令参数
+ * @retval: none
+ */
 static void DevScreen_StartorStop(uint8_t *buff)
 {
 	WorkSta = (buff[0] == 0) ? DEVWORKSTOP : DEVWORKSTART;
 	UltraWorkTime = 0;
 }
 
+/* @brief:	屏幕设置驱动频率
+ * @param:	buff-指令参数
+ * @retval: none
+ */
 static void DevScreen_SetUltraFreq(uint8_t *buff)
 {
 	uint8_t tag_i = 0;
@@ -77,6 +85,10 @@ static void DevScreen_SetUltraFreq(uint8_t *buff)
 	}
 }
 
+/* @brief:	屏幕设置震动等级
+ * @param:	buff-指令参数
+ * @retval: none
+ */
 static void DevScreen_SetUltraVibra(uint8_t *buff)
 {
 	if((DevParamRead.UltraParam.VibraEnableFlg != (uint16_t)buff[0]) ||
@@ -88,6 +100,10 @@ static void DevScreen_SetUltraVibra(uint8_t *buff)
 	}
 }
 
+/* @brief:	屏幕设置脉冲占空比
+ * @param:	buff-指令参数
+ * @retval: none
+ */
 static void DevScreen_SetUltraDuty(uint8_t *buff)
 {
 	uint8_t tag_i;
@@ -102,7 +118,7 @@ static void DevScreen_SetUltraDuty(uint8_t *buff)
 			FlashSaveFlg = 1;
 			if(pluse_duty_temp == 100)
 			{
-				DevParamRead.UltraParam.PluseDuty[tag_i] = 101;
+				DevParamRead.UltraParam.PluseDuty[tag_i] = 101;    //保证占空比100%时,PWM输出会溢出
 			}else
 			{
 				DevParamRead.UltraParam.PluseDuty[tag_i] = pluse_duty_temp;
@@ -112,6 +128,10 @@ static void DevScreen_SetUltraDuty(uint8_t *buff)
 	}
 }
 
+/* @brief:	屏幕设置脉冲周期
+ * @param:	buff-指令参数
+ * @retval: none
+ */
 static void DevScreen_SetUltraPeriod(uint8_t *buff)
 {
 	uint8_t tag_i = 0;
@@ -139,6 +159,10 @@ static void DevScreen_SetUltraPeriod(uint8_t *buff)
 	}
 }
 
+/* @brief:	屏幕设置刺激时长和脉冲时长
+ * @param:	buff-指令参数
+ * @retval: none
+ */
 static void DevScreen_SetUltraWork(uint8_t *buff)
 {
 	uint16_t stimu_temp = 0;
@@ -154,6 +178,10 @@ static void DevScreen_SetUltraWork(uint8_t *buff)
 	}
 }
 
+/* @brief:	屏幕设置超声通道使能
+ * @param:	buff-指令参数
+ * @retval: none
+ */
 static void DevScreen_SetUltraChEn(uint8_t *buff)
 {
 	uint8_t tag_i = 0;
@@ -168,9 +196,13 @@ static void DevScreen_SetUltraChEn(uint8_t *buff)
 	}
 }
 
+/* @brief:	屏幕设置设备工作模式
+ * @param:	buff-指令参数
+ * @retval: none
+ */
 static void DevScreen_SetUltraModule(uint8_t * buff)
 {
-	if(DevParamRead.UltraParam.UltraWorkModule == buff[0])
+	if(DevParamRead.UltraParam.UltraWorkModule != buff[0])
 	{
 		FlashSaveFlg = 1;
 		DevParamRead.UltraParam.UltraWorkModule = (buff[0] == 0) ? 2 : buff[0];
@@ -178,6 +210,10 @@ static void DevScreen_SetUltraModule(uint8_t * buff)
 
 }
 
+/* @brief:	屏幕设置超声驱动电压
+ * @param:	buff-指令参数
+ * @retval: none
+ */
 static void DevScreen_SetPowerLevel(uint8_t * buff)
 {
 	if(DevParamRead.UltraParam.UltraPowerLevel != buff[0])
