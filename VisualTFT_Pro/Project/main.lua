@@ -39,11 +39,13 @@ local PowerLevel = 1
 local FlashSaveBuff = {}
 local SceenCmdBuff = {[0]=0xEE,0xB5,0xB2,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFC,0xFF,0xFF}
 
-local record_buff = {[0] = "2025:12:1:16:56","2025:12:1:16:57"}
+local record_buff = {[0] = "2025-12-1 16:56","2025-12-1 16:57"}
 local record_index = 0
 
 local UltraChEnableNum = 0
 local UltraChEnableId = {[0] = 0,0,0,0,0,0,0,0,0}
+
+local CycleId = 0
 --初始化函数
 function on_init()
 set_visiable(screen_main,6,0)
@@ -68,8 +70,8 @@ State = 0
 beep_count = 0
 function on_timer(timer_id)
 	
-	StimuTime = get_value(screen_stimutime,1) / 10			--定时器以10为单位   闪灯时时间间隔除以10
-	IdleTime  = get_value(screen_stimutime,2) / 10
+	StimuTime = get_value(screen_stimutime,1) / 50			--定时器以10为单位   闪灯时时间间隔除以10
+	IdleTime  = get_value(screen_stimutime,2) / 50			
 
 	if timer_id == 0 then													--上电延迟进入主界面
 		set_backlight(lightlevel)
@@ -88,18 +90,15 @@ function on_timer(timer_id)
  			CmdSet = screen_main	
 			record_index = record_index + 1
 			local record_data = 'record_index' .. ';' .. record_buff[0] .. ';' .. record_buff[1] ..';'
+			CycleId = 0
 			record_add(screen_record,1,record_data)
 			set_text(screen_main,1,"治疗已完成")
  			set_enable(screen_main,2,1)	
  			set_value(screen_main,3,0)	
-			set_value(screen_main,5,0)
-			set_value(screen_main,6,0)
-			set_value(screen_main,8,0)
-			set_value(screen_main,9,0)	
-			set_value(screen_main,7,0)
-			set_value(screen_main,10,0)
-			set_value(screen_main,11,0)
-			set_value(screen_main,12,0)		
+			--探头复位
+			for i = 1,8 do
+				set_value(screen_main,UltraChEnableId[i-1] + 8,0)
+			end		
  			SendWorkStartStop()		
 			stop_timer(1)
 			stop_timer(3)	
@@ -142,21 +141,14 @@ function on_timer(timer_id)
 
 	if timer_id == 3 then
 		CycleTime = CycleTime + 1
-		if CycleTime <= StimuTime  and State == 0 then
-
-			State = 1
-		elseif (CycleTime >= StimuTime) and (CycleTime <= (IdleTime  + StimuTime) / 2) and State == 1 then
-
-			State = 2
-		elseif (CycleTime >= (IdleTime  + StimuTime) / 2) and (CycleTime <= (IdleTime  * 0.5 + StimuTime * 1.5)) and State == 2 then
-
-			State = 3
-		elseif (CycleTime >= (IdleTime  * 0.5 + StimuTime * 1.5)) and (CycleTime <= IdleTime + StimuTime) and State == 3 then
-
-			State = 0
-		elseif CycleTime > (IdleTime + StimuTime) then
-			State = 0
-			CycleTime = 0
+		if WorkModule == 1 then
+			WorkModeSync(StimuTime,IdleTime,CycleTime)
+		elseif WorkModule == 2 then
+			WorkModeAlternate1(StimuTime,IdleTime,CycleTime)
+		elseif WorkModule == 3 then
+			WorkModeLoop(StimuTime,IdleTime,CycleTime)
+		elseif WorkModule == 4 then
+			WorkModeAlternate2(StimuTime,IdleTime,CycleTime)
 		end
 	end
 
@@ -186,25 +178,21 @@ function on_control_notify(screen,control,value)
 		CmdSet = screen_main
 		ShowRTCTime(1)
 		start_timer(1,999,0,0)
-		start_timer(3,5,0,0)	
+		start_timer(3,10,0,0)	
 		start_timer(2,100,0,0)	
  		stop_timer(4)	
 	elseif(screen == screen_main) and (control == 3) and (value == 0) then
 		WorkTime = 0
 		CycleTime = 0
+		CycleId = 0
 		ShowTime(WorkTime)
 		ShowRTCTime(0)
-		set_value(screen_main,5,0)
-		set_value(screen_main,6,0)
-		set_value(screen_main,8,0)
-		set_value(screen_main,9,0)	
-		set_value(screen_main,7,0)
-		set_value(screen_main,10,0)
-		set_value(screen_main,11,0)
-		set_value(screen_main,12,0)	
 		set_text(screen_main,1,"治疗已完成")
 		SendWorkStartStop()
-		
+		--探头复位
+		for i = 1,8 do
+			set_value(screen_main,UltraChEnableId[i-1] + 8,0)
+		end
 		local record_data = 'record_index' .. ';' .. record_buff[0] .. ';' .. record_buff[1] ..';'
 		record_add(screen_record,1,record_data)
 		CmdSet = screen_main
@@ -362,6 +350,9 @@ function on_control_notify(screen,control,value)
 			else
 				set_value(screen_workmodule,2,1)
  				WorkModule = 2	
+ 				if get_value(screen_stimutime,1) > get_value(screen_stimutime,2) then --交替模式下间歇时长小于刺激时长，增加间歇时长
+					set_value(screen_stimutime,2,get_value(screen_stimutime,1))
+				end	
 			end
  			CmdSet = screen_workmodule	
  			SendWorkModule()	
@@ -515,12 +506,16 @@ function DevParamInit()
 	else
 		if param_read[0] == 1 then					--同步模式
 			set_value(screen_workmodule,1,1)
+			WorkModule = 1
 		elseif param_read[0] == 2 then			 --交替模式1
  			set_value(screen_workmodule,2,1)
+			WorkModule = 2
 		elseif param_read[0] == 3 then			 --循环模式
 			set_value(screen_workmodule,3,1)
+			WorkModule = 3
 		elseif param_read[0] == 4 then			--交替模式2
  			set_value(screen_workmodule,4,1)	
+			WorkModule = 4
 		end
 	end
 
@@ -793,6 +788,95 @@ function ShowRTCTime(work_sta)
 		record_buff[0] = year .. "-" .. tim_buff[0] .. "-" .. tim_buff[1] .. " " .. tim_buff[2] .. ":" .. tim_buff[3] .. ":" .. tim_buff[4]
 	elseif work_sta == 0 then
 		record_buff[1] = year .. "-" .. tim_buff[0] .. "-" .. tim_buff[1] .. " " .. tim_buff[2] .. ":" .. tim_buff[3] .. ":" .. tim_buff[4]
+	end
+end
+
+--探头工作模式-同步模式
+function WorkModeSync(stim,idle,worktim)
+	if worktim < stim then
+		for i=1,UltraChEnableNum do
+			set_value(screen_main,UltraChEnableId[i-1]+8,1)
+		end
+	elseif worktim < (idle + stim) then
+		for i=1,UltraChEnableNum do
+			set_value(screen_main,UltraChEnableId[i-1]+8,0)
+		end
+	else
+		CycleTime = 0
+	end
+end
+
+--探头工作模式-交替模式1
+function WorkModeAlternate1(stim,idle,worktim)
+	if worktim < stim then
+		for i=1,UltraChEnableNum do
+			if i % 2 == 1 then
+				set_value(screen_main,UltraChEnableId[i-1]+8,1)
+			else
+				set_value(screen_main,UltraChEnableId[i-1]+8,0)
+			end
+		end
+	elseif worktim >= stim and worktim < (idle + stim) /2 then
+		for i=1,UltraChEnableNum do
+			if i % 2 == 1 then
+				set_value(screen_main,UltraChEnableId[i-1]+8,0)
+			end
+		end
+	elseif worktim >= (idle + stim)/2 and worktim < (idle + stim*3) /2 then
+		for i=1,UltraChEnableNum do
+			if i % 2 == 0 then
+				set_value(screen_main,UltraChEnableId[i-1]+8,1)
+			else
+				set_value(screen_main,UltraChEnableId[i-1]+8,0)
+			end
+		end
+	elseif worktim >= (idle + stim*3)/2 and worktim < (idle + stim) then
+		for i=1,UltraChEnableNum do
+			if i % 2 == 0 then
+				set_value(screen_main,UltraChEnableId[i-1]+8,0)
+			end
+		end
+	else
+		CycleTime = 0
+	end
+end
+
+--探头循环模式
+function WorkModeLoop(stim,idle,worktim)
+	local cycle_time = (stim + idle) / UltraChEnableNum
+
+	if worktim < stim then
+		set_value(screen_main,UltraChEnableId[CycleId]+8,1)
+	elseif worktim >= stim and worktim < cycle_time then
+		set_value(screen_main,UltraChEnableId[CycleId]+8,0)
+	else
+		set_value(screen_main,UltraChEnableId[CycleId]+8,0)
+		CycleId = CycleId + 1
+		if CycleId == UltraChEnableNum then
+			CycleId = 0
+		end
+		CycleTime = 0
+	end
+end
+
+--探头工作模式-交替模式2
+function WorkModeAlternate2(stim,idle,worktim)
+	local cycle_time = (stim + idle) / 4
+
+	if worktim < stim then
+		set_value(screen_main,UltraChEnableId[CycleId*2]+8,1)
+		set_value(screen_main,UltraChEnableId[CycleId*2 + 1]+8,1)
+	elseif worktim >= stim and worktim < cycle_time then
+		set_value(screen_main,UltraChEnableId[CycleId*2]+8,0)
+		set_value(screen_main,UltraChEnableId[CycleId*2 + 1]+8,0)
+	else
+		set_value(screen_main,UltraChEnableId[CycleId]+8,0)
+		set_value(screen_main,UltraChEnableId[CycleId*2 + 1]+8,0)
+		CycleId = CycleId + 1
+		if CycleId == 4 then
+			CycleId = 0
+		end
+		CycleTime = 0
 	end
 end
 

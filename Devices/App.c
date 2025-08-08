@@ -260,9 +260,9 @@ static void UltraWorkModule_AlternateMode2(void)
 	uint32_t idle_start,idle_stop;
 	uint32_t alter_cycle = 0;
 
-	alter_cycle = (IdleTime + StimuTime) / 4;
+	alter_cycle = (IdleTime + StimuTime) * 10 / 4;
 	group_id = UltraWorkTime / alter_cycle;
-	idle_start = ((group_id + 4) * StimuTime / 4) + group_id * IdleTime;
+	idle_start = ((group_id + 4) * StimuTime + (group_id * IdleTime)) * 10 / 4;
 	idle_stop = alter_cycle * (group_id + 1);
 
 	if((UltraWorkTime > idle_start) && (UltraWorkTime <= idle_stop))
@@ -303,7 +303,7 @@ static void UltraWorkModule_AlternateMode2(void)
 		break;
 	}
 
-	if(UltraWorkTime > IdleTime + StimuTime)
+	if(UltraWorkTime > (IdleTime + StimuTime) * 10)
 	{
 		UltraWorkTime = 0;
 	}
